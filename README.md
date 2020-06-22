@@ -1,6 +1,6 @@
 fit a mixture to eqtl summary stats
 
-Code adapted from original by Paul Kirk
+non-stan code adapted from original by Paul Kirk
 
 ## 1d clustering with stan
 
@@ -44,4 +44,3 @@ for i in 1 2 3; do
 done
 
 ```
-
