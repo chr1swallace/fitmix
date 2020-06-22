@@ -129,40 +129,6 @@ fitmix <- function(obsData, obsVars, savefile,
         }
         clusterVars <- sort(clusterVars)
 
-## ###Update the cluster means:
-##         for(k in 2:K) ## don't update null cluster 
-##         {
-##             if(nAllocsPerCluster[k] == 0)
-##             {
-##                                         #Sample from prior 
-##                 clusterMeans[k] <- rnorm(d, mean = mu0, sd = sigma0)
-##             } else{
-##                 allocInds <- which(clusterAllocations == k)
-##                 currentClusterMean     <- clusterMeans[k]
-##                 currentClusterVars=exp(logClusterVars[k])
-##                 ## proposedClusterMean    <- currentClusterMean  + rnorm(d, sd = 0.5)
-##                 proposedClusterMean    <- currentClusterMean  + rnorm(d, sd = 1) # data limited by (-0.1,0.1), no point jumping about outside this
-                
-##                 logPriorCurrent     <- dnorm( currentClusterMean, mean = mu0, sd = sigma0, log = T)
-##                 logPriorProposed    <- dnorm(proposedClusterMean, mean = mu0, sd = sigma0, log = T)
-##                 currentLogLikeli  <-
-##                     sum(dnorm(obsData[allocInds],
-##                               currentClusterMean,
-##                               sd=sqrt(currentClusterVars + obsVars[allocInds])))
-##                 proposedLogLikeli <-
-##                     sum(dnorm(obsData[allocInds],
-##                               proposedClusterMean,
-##                               sd=sqrt(currentClusterVars + obsVars[allocInds])))
-##                 meanTrials[k] <- meanTrials[k] + 1
-##                 MHratio <- exp(proposedLogLikeli+logPriorProposed - currentLogLikeli- logPriorCurrent )
-##                 Accept <- runif(d) < MHratio
-##                 if(Accept) {
-##                     clusterMeans[k]    <- proposedClusterMean
-##                     meanAcceptances[k] <- meanAcceptances[k] + 1
-##                 }
-##             }
-##         }
-
         if(its%%thinner == 0){
             if(quiet)
                 pb$tick()
@@ -174,19 +140,15 @@ fitmix <- function(obsData, obsVars, savefile,
             savedMixtureWeights[[counter]] <- mixtureWeights
             ## savedClusterAllocations[counter,] <- clusterAllocations
             counter <- counter + 1
-            if(its %% 50000 == 0)
-            {
-                print("Saving...")
-##                 save(varianceAcceptances,varianceTrials,
-##          meanAcceptances,meanTrials,
-## savedClusterAllocations, savedClusterMeans, savedMixtureWeights, savedLogClusterVars, file = savefile)
+            if(its %% 10000 == 0) {
+              print("Saving...")
+              save(savedMixtureWeights,
+                   savedClusterVars, file = savefile)
             }
         }
     }
-    save(#varianceAcceptances,varianceTrials,
-         #meanAcceptances,meanTrials,
-        #savedClusterAllocations, #savedClusterMeans,
-        savedMixtureWeights,
-        savedClusterVars, file = savefile)
+  if(!(its %% 10000 == 0))
+    save(savedMixtureWeights,
+         savedClusterVars, file = savefile)
 }
 
